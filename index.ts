@@ -8,7 +8,7 @@ import {
   Color, Fog,
   HemisphereLight, SpotLight, PointLight,
   GridHelper, PlaneGeometry, DoubleSide,
-  Mesh, MeshBasicMaterial, MeshNormalMaterial, MeshPhongMaterial, SmoothShading
+  Mesh, MeshBasicMaterial, MeshNormalMaterial, MeshPhongMaterial, SmoothShading, MeshLambertMaterial, TextureLoader
 } from 'three';
 
 class ThreeBox extends PolymerElement {
@@ -116,6 +116,13 @@ class ThreeBox extends PolymerElement {
     var material = new MeshNormalMaterial();
     this._cube = new Mesh( geometry, material );
     this._scene.add( this._cube );
+
+		var loader = new TextureLoader();
+		var map = loader.load( 'textures/brick_diffuse.jpg' );
+    var textMat = new MeshLambertMaterial( { map: map } ) ;
+    this._cube2 = new Mesh( geometry, textMat );
+    this._cube2.position.set( -0.2, 0, 0 );
+    this._scene.add( this._cube2 );
 
     // this._scene.add(this._gridHelper);
   }
