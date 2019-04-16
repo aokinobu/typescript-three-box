@@ -69,8 +69,6 @@ class ThreeBox extends PolymerElement {
     this._scene = new Scene();
     this._scene.background = new Color(this.backgroundcolor);
     this._scene.fog = new Fog(this.backgroundcolor);
-    this._camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    this._camera.position.z = 5;
     this.__setGrid();
     this.__initRender();
     this.__render();
@@ -102,6 +100,7 @@ class ThreeBox extends PolymerElement {
         // no shadydom for you
       }
     });
+    this.__setCameraAndRenderDimensions();
   }
 
   /**
@@ -113,11 +112,10 @@ class ThreeBox extends PolymerElement {
     // this._gridHelper = new GridHelper(1000, 50, 0xffffff, 0xffffff);
     // this._gridHelper.geometry.rotateX( Math.PI / 2 );
     // this._gridHelper.lookAt(new Vector3(0, 0, 1));
-    var geometry = new BoxGeometry( 1, 1, 1 );
-    var material = new MeshBasicMaterial( { color: 0x00ff00 } );
+    var geometry = new BoxGeometry( 0.2, 0.2, 0.2 );
+    var material = new MeshNormalMaterial();
     this._cube = new Mesh( geometry, material );
     this._scene.add( this._cube );
-    this._camera.position.z = 5;
 
     // this._scene.add(this._gridHelper);
   }
@@ -141,6 +139,48 @@ class ThreeBox extends PolymerElement {
     requestAnimationFrame(() => this.__render());
     this._renderer.render(this._scene, this._camera);
   }
+
+  /**
+   * Define our single camera and its position
+   * @memberof StlPartViewer
+   * @private
+   */
+  __setCameraAndRenderDimensions() {
+    // This is for the fullscreen exit; the offset is incorrect when checked
+    // immediately, so we just cache it for speed
+    // TODO track this on potential element resizing
+    // console.log("window.offsetWidth");
+    // console.log(window.offsetWidth);
+    // this._elementDimensions = {
+    //   'width': window.offsetWidth,
+    //   'height': window.offsetHeight,
+    // };
+
+    this._camera = new PerspectiveCamera( 5, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    // this._camera.position.set(-350, -100, 100)
+    // this._camera.up = new Vector3(0, 0, 1);
+
+    // this._camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    this._camera.position.z = 5;
+
+    this.__setProjectionMatrix(this.offsetWidth, this.offsetHeight);
+  }
+
+  /**
+   * Set the render size and camera aspect ratio as needed based on display
+   * height and width. Important for resize and full screen events (otherwise
+   * we'll be blurring and stretched).
+   * @param {Number} width
+   * @param {Number} height
+   * @memberof StlPartViewer
+   * @private
+   */
+  __setProjectionMatrix(width, height) {
+    this._renderer.setSize(width, height);
+    this._camera.aspect = width / height;
+    this._camera.updateProjectionMatrix();
+  }
+
 
 }
 
